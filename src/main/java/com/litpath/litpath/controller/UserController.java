@@ -3,6 +3,10 @@ package com.litpath.litpath.controller;
 import com.litpath.litpath.dto.UserRequestDTO;
 import com.litpath.litpath.dto.UserResponseDTO;
 import com.litpath.litpath.service.UserService;
+
+import jakarta.validation.Valid;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +22,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserResponseDTO createUser(@RequestBody UserRequestDTO dto) {
+    public UserResponseDTO createUser(@Valid @RequestBody UserRequestDTO dto) {
         return userService.createUser(dto);
     }
 
@@ -28,13 +32,14 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public UserResponseDTO getUser(@PathVariable Long id) {
-        return userService.getUserById(id);
+    public ResponseEntity<UserResponseDTO> getUser(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserById(id));
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 }
 
