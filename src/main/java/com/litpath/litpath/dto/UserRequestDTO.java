@@ -33,3 +33,4 @@ public class UserRequestDTO {
     @NotBlank(message = "Confirmação de senha é obrigatória.")
     private String confirmPassword;
 }
+ 

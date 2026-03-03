@@ -1,11 +1,14 @@
 package com.litpath.litpath.service;
 
+import com.litpath.litpath.dto.LoginRequestDTO;
 import com.litpath.litpath.dto.UserRequestDTO;
 import com.litpath.litpath.dto.UserResponseDTO;
 import com.litpath.litpath.exception.BusinessException;
 import com.litpath.litpath.exception.ResourceNotFoundException;
 import com.litpath.litpath.model.User;
 import com.litpath.litpath.repository.UserRepository;
+import com.litpath.litpath.security.JwtService;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,11 +21,14 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public UserService(UserRepository userRepository,
-                       PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     // CREATE
@@ -59,8 +65,7 @@ public class UserService {
     // ===============================
     public UserResponseDTO getUserById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Usuário não encontrado!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado!"));
 
         return toDTO(user);
     }
@@ -107,5 +112,23 @@ public class UserService {
         dto.setEmail(user.getEmail());
         dto.setUsername(user.getUsername());
         return dto;
+    }
+
+    public String login(LoginRequestDTO request) {
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new BusinessException("Email ou senha inválidos"));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new BusinessException("Email ou senha inválidos");
+        }
+
+        return jwtService.generateToken(user.getEmail());
+    }
+
+    public UserResponseDTO getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado!"));
+        return toDTO(user);
     }
 }
