@@ -131,4 +131,12 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado!"));
         return toDTO(user);
     }
+
+    @Transactional
+    public void deleteUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado!"));
+
+        userRepository.delete(user);
+    }
 }
