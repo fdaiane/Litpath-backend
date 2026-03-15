@@ -1,13 +1,11 @@
 package com.litpath.litpath.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.litpath.litpath.dto.openlibrary.*;
 import com.litpath.litpath.model.Author;
 import com.litpath.litpath.model.Book;
 import com.litpath.litpath.model.Genre;
 import com.litpath.litpath.repository.AuthorRepository;
 import com.litpath.litpath.repository.BookRepository;
-import lombok.Data;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +15,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -236,75 +233,5 @@ public class OpenLibraryService {
                 Character.UnicodeBlock.of(c) == Character.UnicodeBlock.LATIN_EXTENDED_A ||
                 Character.UnicodeBlock.of(c) == Character.UnicodeBlock.LATIN_EXTENDED_B
         );
-    }
-
-    // ===============================
-    // DTOs — OpenLibrary
-    // ===============================
-    @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class OLAuthorSearchResult {
-        private List<OLAuthorDoc> docs;
-    }
-
-    @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class OLAuthorDoc {
-        private String key;
-        private String name;
-
-        @JsonProperty("birth_date")
-        private String birthDate;
-
-        @JsonProperty("top_subjects")
-        private List<String> topSubjects;
-    }
-
-    @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class OLAuthorDetail {
-        private String key;
-        private String name;
-
-        @JsonProperty("bio")
-        private Object bio;
-
-        @JsonProperty("birth_date")
-        private String birthDate;
-
-        @JsonProperty("personal_name")
-        private String personalName;
-    }
-
-    // ===============================
-    // DTOs — Google Books
-    // ===============================
-    @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class GoogleBooksResult {
-        private List<GoogleBookItem> items;
-    }
-
-    @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class GoogleBookItem {
-        private GoogleVolumeInfo volumeInfo;
-    }
-
-    @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class GoogleVolumeInfo {
-        private String title;
-        private String description;
-        private String publishedDate;
-        private List<String> categories;
-        private GoogleImageLinks imageLinks;
-    }
-
-    @Data
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class GoogleImageLinks {
-        private String thumbnail;
-        private String smallThumbnail;
     }
 }
