@@ -33,9 +33,7 @@ public class BookService {
         this.genreRepository = genreRepository;
     }
 
-    // ===============================
-    // CRIAR LIVRO
-    // ===============================
+    
     @Transactional
     public BookResponseDTO createBook(BookRequestDTO dto) {
 
@@ -43,7 +41,6 @@ public class BookService {
                 .orElseThrow(() -> new ResourceNotFoundException("Autor não encontrado!"));
 
         Set<Genre> genres = new HashSet<>();
-
         if (dto.getGenreIds() != null && !dto.getGenreIds().isEmpty()) {
             genres = dto.getGenreIds().stream()
                     .map(id -> genreRepository.findById(id)
@@ -60,13 +57,11 @@ public class BookService {
         book.setGenres(genres);
 
         book = bookRepository.save(book);
-
         return toDTO(book);
     }
 
-    // ===============================
-    // LISTAR TODOS
-    // ===============================
+    
+    @Transactional(readOnly = true)
     public List<BookResponseDTO> getAllBooks() {
         return bookRepository.findAll()
                 .stream()
@@ -74,18 +69,16 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    // ===============================
-    // BUSCAR POR ID
-    // ===============================
+    
+    @Transactional(readOnly = true)
     public BookResponseDTO getBookById(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado!"));
         return toDTO(book);
     }
 
-    // ===============================
-    // BUSCAR POR TÍTULO
-    // ===============================
+    
+    @Transactional(readOnly = true)
     public List<BookResponseDTO> searchByTitle(String title) {
         return bookRepository.findByTitleContainingIgnoreCase(title)
                 .stream()
@@ -93,9 +86,8 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    // ===============================
-    // BUSCAR POR AUTOR
-    // ===============================
+    
+    @Transactional(readOnly = true)
     public List<BookResponseDTO> getBooksByAuthor(Long authorId) {
         return bookRepository.findByAuthorId(authorId)
                 .stream()
@@ -103,49 +95,31 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    // ===============================
-    // ATUALIZAR LIVRO
-    // ===============================
+    
     @Transactional
     public BookResponseDTO updateBook(Long id, BookRequestDTO dto) {
 
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Livro não encontrado!"));
 
-        if (dto.getTitle() != null) {
-            book.setTitle(dto.getTitle());
-        }
-
-        if (dto.getSynopsis() != null) {
-            book.setSynopsis(dto.getSynopsis());
-        }
-
-        if (dto.getPublicationYear() != null) {
-            book.setPublicationYear(dto.getPublicationYear());
-        }
-
-        if (dto.getCoverUrl() != null) {
-            book.setCoverUrl(dto.getCoverUrl());
-        }
+        if (dto.getTitle() != null)           book.setTitle(dto.getTitle());
+        if (dto.getSynopsis() != null)         book.setSynopsis(dto.getSynopsis());
+        if (dto.getPublicationYear() != null)  book.setPublicationYear(dto.getPublicationYear());
+        if (dto.getCoverUrl() != null)         book.setCoverUrl(dto.getCoverUrl());
 
         if (dto.getGenreIds() != null) {
-
             Set<Genre> genres = dto.getGenreIds().stream()
                     .map(genreId -> genreRepository.findById(genreId)
                             .orElseThrow(() -> new ResourceNotFoundException("Gênero não encontrado!")))
                     .collect(Collectors.toSet());
-
             book.setGenres(genres);
         }
 
         book = bookRepository.save(book);
-
         return toDTO(book);
     }
 
-    // ===============================
-    // DELETAR LIVRO
-    // ===============================
+    
     @Transactional
     public void deleteBook(Long id) {
         if (!bookRepository.existsById(id)) {
@@ -154,10 +128,8 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
-    // ===============================
-    // CONVERSÃO PARA DTO
-    // ===============================
-    private BookResponseDTO toDTO(Book book) {
+    
+    public BookResponseDTO toDTO(Book book) {
 
         BookResponseDTO dto = new BookResponseDTO();
         dto.setId(book.getId());
@@ -168,7 +140,6 @@ public class BookService {
         dto.setAuthorName(book.getAuthor().getName());
 
         if (book.getGenres() != null && !book.getGenres().isEmpty()) {
-
             List<GenreDTO> genres = book.getGenres().stream()
                     .map(g -> {
                         GenreDTO genreDTO = new GenreDTO();
@@ -177,7 +148,6 @@ public class BookService {
                         return genreDTO;
                     })
                     .collect(Collectors.toList());
-
             dto.setGenres(genres);
         }
 

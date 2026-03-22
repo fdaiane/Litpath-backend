@@ -44,13 +44,11 @@ public class OpenLibraryService {
         this.genreService = genreService;
     }
 
-    // ===============================
-    // IMPORT COMPLETO: autor (OpenLibrary) + livros (Google Books)
-    // ===============================
+    
     @Transactional
     public Author importAuthorByName(String name) {
 
-        // 1. Busca dados do autor na OpenLibrary
+        
         OLAuthorSearchResult searchResult = searchAuthor(name);
 
         if (searchResult == null || searchResult.getDocs() == null || searchResult.getDocs().isEmpty()) {
@@ -60,15 +58,15 @@ public class OpenLibraryService {
         OLAuthorDoc doc = searchResult.getDocs().get(0);
         String authorKey = doc.getKey();
 
-        // 2. Busca detalhes do autor na OpenLibrary
+        
         OLAuthorDetail detail = getAuthorDetail(authorKey);
 
-        // 3. Cria e salva o Author com dados da OpenLibrary
+        
         Author author = new Author();
         author.setName(detail.getName() != null ? detail.getName() : doc.getName());
         author.setPhotoUrl(getPhotoUrl(authorKey));
 
-        // Biografia pode ser String ou objeto {value: "..."}
+        
         if (detail.getBio() instanceof String) {
             author.setBiography((String) detail.getBio());
         } else if (detail.getBio() instanceof java.util.Map) {
@@ -76,25 +74,23 @@ public class OpenLibraryService {
             if (value != null) author.setBiography(value.toString());
         }
 
-        // Data de nascimento
+        
         if (detail.getBirthDate() != null) {
             author.setBirthDate(parseDateSafely(detail.getBirthDate()));
         }
 
         author = authorRepository.save(author);
 
-        // 4. Busca livros no Google Books em PT e EN (para cobrir mais resultados)
+        
         Set<String> titulosJaSalvos = new HashSet<>();
         importGoogleBooks(author, name, "pt", titulosJaSalvos);
         importGoogleBooks(author, name, "en", titulosJaSalvos);
 
-        // Recarrega com os livros já salvos
+        
         return authorRepository.findById(author.getId()).orElse(author);
     }
 
-    // ===============================
-    // BUSCA E SALVA LIVROS DO GOOGLE BOOKS
-    // ===============================
+    
     private void importGoogleBooks(Author author, String authorName,
                                     String langRestrict, Set<String> titulosJaSalvos) {
 
@@ -118,10 +114,10 @@ public class OpenLibraryService {
             GoogleVolumeInfo info = item.getVolumeInfo();
             if (info == null || info.getTitle() == null) continue;
 
-            // Filtro: apenas alfabeto latino
+            
             if (!isLatinTitle(info.getTitle())) continue;
 
-            // Evita duplicatas pelo título normalizado
+            
             String tituloNormalizado = info.getTitle().trim().toLowerCase();
             if (titulosJaSalvos.contains(tituloNormalizado)) continue;
             titulosJaSalvos.add(tituloNormalizado);
@@ -130,17 +126,17 @@ public class OpenLibraryService {
             book.setTitle(info.getTitle());
             book.setAuthor(author);
 
-            // Sinopse
+            
             if (info.getDescription() != null) {
                 book.setSynopsis(info.getDescription());
             }
 
-            // Ano de publicação
+            
             if (info.getPublishedDate() != null) {
                 book.setPublicationYear(parseYearSafely(info.getPublishedDate()));
             }
 
-            // Capa (troca http por https e pega versão maior)
+            
             if (info.getImageLinks() != null && info.getImageLinks().getThumbnail() != null) {
                 String cover = info.getImageLinks().getThumbnail()
                         .replace("http://", "https://")
@@ -148,7 +144,7 @@ public class OpenLibraryService {
                 book.setCoverUrl(cover);
             }
 
-            // Gêneros das categorias do Google Books
+            
             Set<Genre> genres = new HashSet<>();
             if (info.getCategories() != null) {
                 info.getCategories().stream()
@@ -165,9 +161,7 @@ public class OpenLibraryService {
         }
     }
 
-    // ===============================
-    // OPENLIBRARY — buscar autor
-    // ===============================
+    
     public OLAuthorSearchResult searchAuthor(String name) {
         return openLibraryClient.get()
                 .uri("/search/authors.json?q={name}&limit=5", name)
@@ -176,9 +170,7 @@ public class OpenLibraryService {
                 .block();
     }
 
-    // ===============================
-    // OPENLIBRARY — detalhes do autor
-    // ===============================
+    
     public OLAuthorDetail getAuthorDetail(String authorKey) {
         String path = authorKey.startsWith("/authors/") ? authorKey : "/authors/" + authorKey;
         return openLibraryClient.get()
@@ -188,9 +180,7 @@ public class OpenLibraryService {
                 .block();
     }
 
-    // ===============================
-    // HELPERS
-    // ===============================
+    
     public String getPhotoUrl(String authorKey) {
         String id = authorKey.replace("/authors/", "");
         return "https://covers.openlibrary.org/a/olid/" + id + "-L.jpg";

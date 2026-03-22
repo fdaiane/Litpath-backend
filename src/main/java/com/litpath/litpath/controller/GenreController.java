@@ -18,26 +18,17 @@ public class GenreController {
         this.genreService = genreService;
     }
 
-    // ===============================
-    // CRIAR GÊNERO MANUALMENTE
-    // ===============================
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GenreDTO> createGenre(@RequestBody GenreDTO dto) {
         return ResponseEntity.ok(genreService.createGenre(dto));
     }
 
-    // ===============================
-    // LISTAR TODOS
-    // ===============================
     @GetMapping
     public ResponseEntity<List<GenreDTO>> listGenres() {
         return ResponseEntity.ok(genreService.getAllGenres());
     }
 
-    // ===============================
-    // DELETAR GÊNERO
-    // ===============================
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteGenre(@PathVariable Long id) {

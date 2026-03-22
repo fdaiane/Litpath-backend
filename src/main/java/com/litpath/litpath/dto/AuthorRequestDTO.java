@@ -11,14 +11,9 @@ public class AuthorRequestDTO {
 
     @NotBlank(message = "Nome do autor é obrigatório")
     private String name;
-
     private String biography;
-
     private String nationality;
-
     private LocalDate birthDate;
-
     private String photoUrl;
-
     private Set<Long> genreIds;
 }

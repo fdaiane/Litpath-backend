@@ -11,15 +11,11 @@ public class BookRequestDTO {
 
     @NotBlank(message = "Título é obrigatório")
     private String title;
-
     private String synopsis;
-
     private Integer publicationYear;
-
     private String coverUrl;
 
     @NotNull(message = "Autor é obrigatório")
     private Long authorId;
-
     private Set<Long> genreIds;
 }

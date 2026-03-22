@@ -3,11 +3,11 @@ package com.litpath.litpath.dto;
 import lombok.Data;
 
 @Data
-public class UserResponseDTO {
+public class UserSummaryDTO {
     private Long id;
+    private String username;
     private String firstName;
     private String lastName;
-    private String email;
-    private String username;
-    private boolean firstLogin;
+    private String photoUrl;
+    private boolean following; 
 }

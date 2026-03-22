@@ -25,9 +25,6 @@ public class AuthorController {
         this.openLibraryService = openLibraryService;
     }
 
-    // ===============================
-    // IMPORT DA OPENLIBRARY (autor + livros + gêneros)
-    // ===============================
     @PostMapping("/import")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuthorResponseDTO> importFromOpenLibrary(
@@ -37,9 +34,6 @@ public class AuthorController {
         return ResponseEntity.ok(authorService.toDTO(author));
     }
 
-    // ===============================
-    // CRIAR AUTOR MANUALMENTE
-    // ===============================
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuthorResponseDTO> createAuthor(
@@ -47,9 +41,6 @@ public class AuthorController {
         return ResponseEntity.ok(authorService.createAuthorFromOpenLibrary(dto));
     }
 
-    // ===============================
-    // ATUALIZAR CAMPOS DO AUTOR
-    // ===============================
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AuthorResponseDTO> updateAuthor(
@@ -58,29 +49,26 @@ public class AuthorController {
         return ResponseEntity.ok(authorService.updateAuthor(id, dto));
     }
 
-    // ===============================
-    // LISTAR TODOS
-    // ===============================
     @GetMapping
     public ResponseEntity<List<AuthorResponseDTO>> listAuthors() {
         return ResponseEntity.ok(authorService.getAllAuthors());
     }
 
-    // ===============================
-    // BUSCAR POR ID
-    // ===============================
     @GetMapping("/{id}")
     public ResponseEntity<AuthorResponseDTO> getAuthor(@PathVariable Long id) {
         return ResponseEntity.ok(authorService.getAuthorById(id));
     }
 
-    // ===============================
-    // DELETAR
-    // ===============================
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteAuthor(@PathVariable Long id) {
         authorService.deleteAuthor(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<AuthorResponseDTO>> searchAuthors(
+            @RequestParam String name) {
+        return ResponseEntity.ok(authorService.searchByName(name));
     }
 }

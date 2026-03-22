@@ -20,9 +20,7 @@ public class GenreService {
         this.genreRepository = genreRepository;
     }
 
-    // ===============================
-    // CRIAR GÊNERO
-    // ===============================
+    
     @Transactional
     public GenreDTO createGenre(GenreDTO dto) {
         if (genreRepository.findByName(dto.getName()).isPresent()) {
@@ -36,9 +34,7 @@ public class GenreService {
         return toDTO(genre);
     }
 
-    // ===============================
-    // BUSCAR OU CRIAR (usado pelo import da OpenLibrary)
-    // ===============================
+    
     @Transactional
     public Genre findOrCreate(String name) {
         return genreRepository.findByName(name)
@@ -49,9 +45,7 @@ public class GenreService {
                 });
     }
 
-    // ===============================
-    // LISTAR TODOS
-    // ===============================
+    
     public List<GenreDTO> getAllGenres() {
         return genreRepository.findAll()
                 .stream()
@@ -59,9 +53,7 @@ public class GenreService {
                 .collect(Collectors.toList());
     }
 
-    // ===============================
-    // DELETAR GÊNERO
-    // ===============================
+    
     @Transactional
     public void deleteGenre(Long id) {
         if (!genreRepository.existsById(id)) {
@@ -70,9 +62,7 @@ public class GenreService {
         genreRepository.deleteById(id);
     }
 
-    // ===============================
-    // CONVERSÃO PARA DTO
-    // ===============================
+    
     public GenreDTO toDTO(Genre genre) {
         GenreDTO dto = new GenreDTO();
         dto.setId(genre.getId());

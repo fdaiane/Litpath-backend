@@ -24,9 +24,7 @@ public class AuthorService {
         this.authorRepository = authorRepository;
     }
 
-    // ===============================
-    // CRIAR AUTOR (manual pelo admin)
-    // ===============================
+    
     @Transactional
     public AuthorResponseDTO createAuthorFromOpenLibrary(AuthorRequestDTO dto) {
 
@@ -42,9 +40,7 @@ public class AuthorService {
         return toDTO(author);
     }
 
-    // ===============================
-    // ATUALIZAR AUTOR
-    // ===============================
+  
     @Transactional
     public AuthorResponseDTO updateAuthor(Long id, AuthorRequestDTO dto) {
 
@@ -72,9 +68,7 @@ public class AuthorService {
         return toDTO(author);
     }
 
-    // ===============================
-    // LISTAR TODOS
-    // ===============================
+
     public List<AuthorResponseDTO> getAllAuthors() {
         return authorRepository.findAll()
                 .stream()
@@ -82,18 +76,14 @@ public class AuthorService {
                 .collect(Collectors.toList());
     }
 
-    // ===============================
-    // BUSCAR POR ID
-    // ===============================
+  
     public AuthorResponseDTO getAuthorById(Long id) {
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Autor não encontrado!"));
         return toDTO(author);
     }
 
-    // ===============================
-    // DELETAR
-    // ===============================
+  
     @Transactional
     public void deleteAuthor(Long id) {
         if (!authorRepository.existsById(id)) {
@@ -102,9 +92,6 @@ public class AuthorService {
         authorRepository.deleteById(id);
     }
 
-    // ===============================
-    // CONVERSÃO PARA DTO
-    // ===============================
     public AuthorResponseDTO toDTO(Author author) {
 
         AuthorResponseDTO dto = new AuthorResponseDTO();
@@ -115,7 +102,6 @@ public class AuthorService {
         dto.setBirthDate(author.getBirthDate());
         dto.setPhotoUrl(author.getPhotoUrl());
 
-        // Livros do autor
         List<BookResponseDTO> books = author.getBooks() != null
                 ? author.getBooks().stream()
                         .map(book -> {
@@ -146,7 +132,6 @@ public class AuthorService {
 
         dto.setBooks(books);
 
-        // Gêneros derivados dos livros (sem duplicatas)
         Set<GenreDTO> genres = author.getBooks() != null
                 ? author.getBooks().stream()
                         .filter(book -> book.getGenres() != null)
@@ -163,5 +148,12 @@ public class AuthorService {
         dto.setGenres(genres);
 
         return dto;
+    }
+
+    public List<AuthorResponseDTO> searchByName(String name) {
+        return authorRepository.findByNameContainingIgnoreCase(name)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
     }
 }
