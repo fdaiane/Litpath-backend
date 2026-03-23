@@ -27,6 +27,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        return "OPTIONS".equalsIgnoreCase(request.getMethod());
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain)
@@ -51,8 +56,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             try {
-                // Se o usuário foi deletado do banco, lança UsernameNotFoundException
-                // e o request continua sem autenticação (token ignorado)
                 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
                 UsernamePasswordAuthenticationToken authToken =
@@ -69,8 +72,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
 
             } catch (UsernameNotFoundException e) {
-                // Usuário não existe mais no banco — token válido mas usuário deletado
-                // Não autentica e retorna 401
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("{\"error\": \"Usuário não encontrado\"}");
                 return;
